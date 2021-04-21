@@ -3,29 +3,8 @@
 const _ = require('ep_etherpad-lite/static/js/underscore');
 const Changeset = require('ep_etherpad-lite/static/js/Changeset');
 
-/**
- * aceAttribsToClasses
- *
- * This hook is called during the attribute processing procedure, and should be used to translate key, value pairs into valid HTML classes that can be inserted into the DOM.
- * The return value for this function should be a list of classes, which will then be parsed into a valid class string.
- *
- * @param hook
- * @param context
- * @returns {[string]}
- *
- * @see https://etherpad.org/doc/v1.8.13/#index_aceattribstoclasses
- */
-exports.aceAttribsToClasses = (hook, context) => {
-    console.debug('ep_title_limit.aceAttribsToClasses', arguments);
+let previousTitleText;
 
-    // Our ep_title_limit_ttl attribute will result in a ep_title_limit_ttl class
-    if (context.key.indexOf('ep_title_limit_ttl:') !== -1) {
-        return ['ep_title_limit_ttl'];
-    }
-    if (context.key === 'ep_title_limit_ttl') {
-        return ['ep_title_limit_ttl'];
-    }
-};
 
 const _checkLineForAttr = (rep, line, attr) => {
     const alineAttrs = rep.alines[line];
@@ -76,7 +55,7 @@ const _displayInfoModal = () => {
     });
 };
 
-let previousTitleText = '';
+
 // Wrap over limit text with marker and display info modal
 let doInsertTitleLimitMark = function () {
     console.debug('ep_title_limit.doInsertTitleLimitMark', arguments, this);
@@ -93,22 +72,46 @@ let doInsertTitleLimitMark = function () {
         return;
     }
 
-    if (text.trim().length < maxLength) {
+    if (text.trim().length <= maxLength) {
         previousTitleText = text;
-        // if (_checkLineForAttr(rep, 0, 'ep_title_limit_ttl')) {
-        //     documentAttributeManager.setAttributesOnRange([0, 0], [0, line.text.length], [['ep_title_limit_ttl', false]]);
-        // }
+        if (_checkLineForAttr(rep, 0, 'ep_title_limit_ttl')) {
+            documentAttributeManager.setAttributesOnRange([0, 0], [0, line.text.length], [['ep_title_limit_ttl', false]]);
+        }
         _hideInfoModal();
     } else {
-        // documentAttributeManager.setAttributesOnRange(
-        //     [0, maxLength + 1],
-        //     [0, line.text.length], [['ep_title_limit_ttl', 'ep_title_limit_ttl']]
-        // );
-        // previousTitleText = text;
+        documentAttributeManager.setAttributesOnRange(
+            [0, maxLength + 1],
+            [0, line.text.length], [['ep_title_limit_ttl', 'ep_title_limit_ttl']]
+        );
+        previousTitleText = text;
         _displayInfoModal();
     }
 };
 
+
+/**
+ * aceAttribsToClasses
+ *
+ * This hook is called during the attribute processing procedure, and should be used to translate key, value pairs into valid HTML classes that can be inserted into the DOM.
+ * The return value for this function should be a list of classes, which will then be parsed into a valid class string.
+ *
+ * @param hook
+ * @param context
+ * @returns {[string]}
+ *
+ * @see https://etherpad.org/doc/v1.8.13/#index_aceattribstoclasses
+ */
+exports.aceAttribsToClasses = (hook, context) => {
+    console.debug('ep_title_limit.aceAttribsToClasses', arguments);
+
+    // Our ep_title_limit_ttl attribute will result in a ep_title_limit_ttl class
+    if (context.key.indexOf('ep_title_limit_ttl:') !== -1) {
+        return ['ep_title_limit_ttl'];
+    }
+    if (context.key === 'ep_title_limit_ttl') {
+        return ['ep_title_limit_ttl'];
+    }
+};
 
 /**
  * aceInitialized
@@ -118,30 +121,33 @@ let doInsertTitleLimitMark = function () {
  *
  * @see https://etherpad.org/doc/v1.8.13/#index_aceinitialized
  */
+
 // Once ace is initialized, we set ace_doInsertTitleLimitMark and bind it to the context
 exports.aceInitialized = (hook, context) => {
-    console.debug('ep_title_limit.aceInitialized', arguments);
-
-    // const editorInfo = context.editorInfo;
-    // editorInfo.ace_doInsertTitleLimitMark = _(doInsertTitleLimitMark).bind(context);
-    // setInterval(function () {
-    //     console.debug('ep_title_limit.aceInitialized.setInterval - do work!', arguments);
-    //
-    //     context.editorInfo.ace_callWithAce(function (ace) {
-    //         var activeLine = ace.ace_caretLine();
-    //         if (activeLine === 0) {
-    //             ace.ace_doInsertTitleLimitMark();
-    //         }
-    //     }, 'insertTitleLimitMark', true);
-    // }, 1000);
+    const editorInfo = context.editorInfo;
+    editorInfo.ace_doInsertTitleLimitMark = _(doInsertTitleLimitMark).bind(context);
 };
 
-var lastEventFiredTimestamp;
+// Triggers before any changes are made, enables plugins to change outcome
+// FIXME: The previousTitleText does not work properly
 exports.aceKeyEvent = (hook, context) => {
-    if(!lastEventFiredTimestamp) lastEventFiredTimestamp = new Date().getTime();
-    var currentEventTimestamp = new Date().getTime();
-    console.debug('ep_title_limit', 'hook:' + hook, context.evt.type, currentEventTimestamp - lastEventFiredTimestamp, context);
-    lastEventFiredTimestamp = currentEventTimestamp;
+    // Check for 'keydown' event only for mobiles to act the same way as desktop - https://github.com/citizenos/citizenos-fe/issues/535#issuecomment-805897450
+    if (context.evt.type !== 'keydown') {
+        return false;
+    }
+
+    // Avoid race condition (callStack === null)
+    setTimeout(function () {
+        context.editorInfo.ace_callWithAce(function (ace) {
+            const activeLine = ace.ace_caretLine();
+            if (activeLine === 0) {
+                ace.ace_doInsertTitleLimitMark();
+            }
+        }, 'insertTitleLimitMark', true);
+    }, 250);
+
+    return false;
 };
 
 exports.aceEditorCSS = () => ['ep_title_limit/static/css/ep_title_limit.css'];
+
