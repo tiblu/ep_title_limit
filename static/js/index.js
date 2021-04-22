@@ -5,7 +5,6 @@ const Changeset = require('ep_etherpad-lite/static/js/Changeset');
 
 let previousTitleText;
 
-
 const _checkLineForAttr = (rep, line, attr) => {
     const alineAttrs = rep.alines[line];
     let hasAttr = false;
@@ -75,10 +74,12 @@ let doInsertTitleLimitMark = function () {
     if (text.trim().length <= maxLength) {
         previousTitleText = text;
         if (_checkLineForAttr(rep, 0, 'ep_title_limit_ttl')) {
+            console.debug('ep_title_limit.setAttributesOnRange', 'UNSET');
             documentAttributeManager.setAttributesOnRange([0, 0], [0, line.text.length], [['ep_title_limit_ttl', false]]);
         }
         _hideInfoModal();
     } else {
+        console.debug('ep_title_limit.setAttributesOnRange', 'SET');
         documentAttributeManager.setAttributesOnRange(
             [0, maxLength + 1],
             [0, line.text.length], [['ep_title_limit_ttl', 'ep_title_limit_ttl']]
@@ -87,7 +88,6 @@ let doInsertTitleLimitMark = function () {
         _displayInfoModal();
     }
 };
-
 
 /**
  * aceAttribsToClasses
@@ -129,7 +129,6 @@ exports.aceInitialized = (hook, context) => {
 };
 
 // Triggers before any changes are made, enables plugins to change outcome
-// FIXME: The previousTitleText does not work properly
 exports.aceKeyEvent = (hook, context) => {
     // Check for 'keydown' event only for mobiles to act the same way as desktop - https://github.com/citizenos/citizenos-fe/issues/535#issuecomment-805897450
     if (context.evt.type !== 'keydown') {
@@ -144,7 +143,7 @@ exports.aceKeyEvent = (hook, context) => {
                 ace.ace_doInsertTitleLimitMark();
             }
         }, 'insertTitleLimitMark', true);
-    }, 250);
+    }, 0);
 
     return false;
 };
