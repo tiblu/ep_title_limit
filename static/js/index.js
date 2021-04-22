@@ -73,17 +73,17 @@ let doInsertTitleLimitMark = function () {
 
     if (text.trim().length <= maxLength) {
         previousTitleText = text;
-        if (_checkLineForAttr(rep, 0, 'ep_title_limit_ttl')) {
-            console.debug('ep_title_limit.setAttributesOnRange', 'UNSET');
-            documentAttributeManager.setAttributesOnRange([0, 0], [0, line.text.length], [['ep_title_limit_ttl', false]]);
-        }
+        // if (_checkLineForAttr(rep, 0, 'ep_title_limit_ttl')) {
+        //     console.debug('ep_title_limit.setAttributesOnRange', 'UNSET');
+        //     documentAttributeManager.setAttributesOnRange([0, 0], [0, line.text.length], [['ep_title_limit_ttl', false]]);
+        // }
         _hideInfoModal();
     } else {
         console.debug('ep_title_limit.setAttributesOnRange', 'SET');
-        documentAttributeManager.setAttributesOnRange(
-            [0, maxLength + 1],
-            [0, line.text.length], [['ep_title_limit_ttl', 'ep_title_limit_ttl']]
-        );
+        // documentAttributeManager.setAttributesOnRange(
+        //     [0, maxLength + 1],
+        //     [0, line.text.length], [['ep_title_limit_ttl', 'ep_title_limit_ttl']]
+        // );
         previousTitleText = text;
         _displayInfoModal();
     }
