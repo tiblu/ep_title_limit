@@ -74,12 +74,10 @@ let doInsertTitleLimitMark = function (context) {
     if (text.trim().length <= maxLength) {
         previousTitleText = text;
         if (_checkLineForAttr(rep, 0, 'ep_title_limit_ttl')) {
-            console.debug('ep_title_limit.setAttributesOnRange', 'UNSET');
             documentAttributeManager.setAttributesOnRange([0, 0], [0, line.text.length], [['ep_title_limit_ttl', false]]);
         }
         _hideInfoModal();
     } else {
-        console.debug('ep_title_limit.setAttributesOnRange', 'SET');
         documentAttributeManager.setAttributesOnRange(
             [0, maxLength + 1],
             [0, line.text.length], [['ep_title_limit_ttl', 'ep_title_limit_ttl']]
@@ -103,15 +101,13 @@ let doInsertTitleLimitMark = function (context) {
  */
 exports.aceAttribsToClasses = (hook, context) => {
     console.debug('ep_title_limit', hook, arguments);
-    console.debug('DO NOTHING');
 
-    // // Our ep_title_limit_ttl attribute will result in a ep_title_limit_ttl class
-    // if (context.key.indexOf('ep_title_limit_ttl:') !== -1) {
-    //     return ['ep_title_limit_ttl'];
-    // }
-    // if (context.key === 'ep_title_limit_ttl') {
-    //     return ['ep_title_limit_ttl'];
-    // }
+    if (context.key.indexOf('ep_title_limit_ttl:') !== -1) {
+        return ['ep_title_limit_ttl'];
+    }
+    if (context.key === 'ep_title_limit_ttl') {
+        return ['ep_title_limit_ttl'];
+    }
 };
 
 /**
