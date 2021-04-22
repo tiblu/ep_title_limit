@@ -17,8 +17,8 @@
  */
 exports.collectContentPre = (hook, context) => {
   console.debug('ep_title_limit', hook, arguments);
-  console.debug('DO NOTHING');
-  // if (context.cls && context.cls.indexOf('ep_title_limit_ttl') > -1) {
-  //   context.cc.doAttrib(context.state, 'ep_title_limit_ttl::ep_title_limit_ttl');
-  // }
+  // context.cls - class name of the element being handled, null if element has no class attribute
+  if (context.cls && context.cls.indexOf('ep_title_limit_ttl') > -1) {
+    context.cc.doAttrib(context.state, 'ep_title_limit_ttl::ep_title_limit_ttl');
+  }
 };
