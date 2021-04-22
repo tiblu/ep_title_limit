@@ -137,14 +137,14 @@ exports.aceKeyEvent = (hook, context) => {
     }
 
     // Avoid race condition (callStack === null)
-    setTimeout(function () {
-        context.editorInfo.ace_callWithAce(function (ace) {
-            const activeLine = ace.ace_caretLine();
-            if (activeLine === 0) {
-                ace.ace_doInsertTitleLimitMark();
-            }
-        }, 'insertTitleLimitMark', true);
-    }, 0);
+    // context.editorInfo.ace_callWithAce(function (ace) {
+    //     const activeLine = ace.ace_caretLine();
+    //     if (activeLine === 0) {
+    //         ace.ace_doInsertTitleLimitMark();
+    //     }
+    // }, 'insertTitleLimitMark', true);
+    //
+    console.debug('ep_title_limit', 'hook' + hook, 'DO NOTHING', arguments);
 
     return false;
 };
