@@ -147,7 +147,7 @@ exports.aceKeyEvent = (hook, context) => {
 
     // Take away EP-s special handling of BACKSPACE
     // FIXME: IF IT WORKS, MACs CMD-H (backspace) should also be handled
-    if (evt.key === 'Backspace' || evt.keyCode === 8) {
+    if (context.evt.key === 'Backspace' || context.evt.keyCode === 8) {
         return true;
     }
 
