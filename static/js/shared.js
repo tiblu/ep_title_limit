@@ -11,15 +11,14 @@
  *
  * @param hook
  * @param context
- * @param cb
  * @returns {*}
  *
  * @see https://etherpad.org/doc/v1.8.13/#index_collectcontentpre
  */
-exports.collectContentPre = (hook, context, cb) => {
-  if (context.cls && context.cls.indexOf('ep_title_limit_ttl') > -1) {
-    context.cc.doAttrib(context.state, 'ep_title_limit_ttl::ep_title_limit_ttl');
-  }
-
-  return cb();
+exports.collectContentPre = (hook, context) => {
+  console.debug('ep_title_limit', hook, arguments);
+  console.debug('DO NOTHING');
+  // if (context.cls && context.cls.indexOf('ep_title_limit_ttl') > -1) {
+  //   context.cc.doAttrib(context.state, 'ep_title_limit_ttl::ep_title_limit_ttl');
+  // }
 };

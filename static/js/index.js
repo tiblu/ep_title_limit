@@ -102,15 +102,16 @@ let doInsertTitleLimitMark = function () {
  * @see https://etherpad.org/doc/v1.8.13/#index_aceattribstoclasses
  */
 exports.aceAttribsToClasses = (hook, context) => {
-    console.debug('ep_title_limit.aceAttribsToClasses', arguments);
+    console.debug('ep_title_limit', hook, arguments);
+    console.debug('DO NOTHING');
 
-    // Our ep_title_limit_ttl attribute will result in a ep_title_limit_ttl class
-    if (context.key.indexOf('ep_title_limit_ttl:') !== -1) {
-        return ['ep_title_limit_ttl'];
-    }
-    if (context.key === 'ep_title_limit_ttl') {
-        return ['ep_title_limit_ttl'];
-    }
+    // // Our ep_title_limit_ttl attribute will result in a ep_title_limit_ttl class
+    // if (context.key.indexOf('ep_title_limit_ttl:') !== -1) {
+    //     return ['ep_title_limit_ttl'];
+    // }
+    // if (context.key === 'ep_title_limit_ttl') {
+    //     return ['ep_title_limit_ttl'];
+    // }
 };
 
 /**
@@ -124,35 +125,40 @@ exports.aceAttribsToClasses = (hook, context) => {
 
 // Once ace is initialized, we set ace_doInsertTitleLimitMark and bind it to the context
 exports.aceInitialized = (hook, context) => {
-    const editorInfo = context.editorInfo;
-    editorInfo.ace_doInsertTitleLimitMark = _(doInsertTitleLimitMark).bind(context);
+    console.debug('ep_title_limit', hook, arguments);
+    console.debug('DO NOTHING');
+    //
+    // const editorInfo = context.editorInfo;
+    // editorInfo.ace_doInsertTitleLimitMark = _(doInsertTitleLimitMark).bind(context);
 };
 
 // Triggers before any changes are made, enables plugins to change outcome
 exports.aceKeyEvent = (hook, context) => {
+
+
     // Check for 'keydown' event only for mobiles to act the same way as desktop - https://github.com/citizenos/citizenos-fe/issues/535#issuecomment-805897450
-    if (context.evt.type !== 'keydown') {
-        return false;
-    }
-
-    // Avoid race condition (callStack === null)
-    setTimeout(function () {
-        context.editorInfo.ace_callWithAce(function (ace) {
-            const activeLine = ace.ace_caretLine();
-            if (activeLine === 0) {
-                ace.ace_doInsertTitleLimitMark();
-            }
-        }, 'insertTitleLimitMark', true);
-    }, 0);
-
-    // Take away EP-s special handling of BACKSPACE
-    // FIXME: IF IT WORKS, MACs CMD-H (backspace) should also be handled
-    if (context.evt.key === 'Backspace' || context.evt.keyCode === 8) { // DOES NOT WORK ON MOBILE, as the keyCode is always 229
-        return true;
-    }
-
-    // FIXME
-    return true;
+    // if (context.evt.type !== 'keydown') {
+    //     return false;
+    // }
+    //
+    // // Avoid race condition (callStack === null)
+    // setTimeout(function () {
+    //     context.editorInfo.ace_callWithAce(function (ace) {
+    //         const activeLine = ace.ace_caretLine();
+    //         if (activeLine === 0) {
+    //             ace.ace_doInsertTitleLimitMark();
+    //         }
+    //     }, 'insertTitleLimitMark', true);
+    // }, 0);
+    //
+    // // Take away EP-s special handling of BACKSPACE
+    // // FIXME: IF IT WORKS, MACs CMD-H (backspace) should also be handled
+    // if (context.evt.key === 'Backspace' || context.evt.keyCode === 8) { // DOES NOT WORK ON MOBILE, as the keyCode is always 229
+    //     return true;
+    // }
+    //
+    // // FIXME
+    return false;
 };
 
 exports.aceEditorCSS = () => ['ep_title_limit/static/css/ep_title_limit.css'];
