@@ -56,12 +56,12 @@ const _displayInfoModal = () => {
 
 
 // Wrap over limit text with marker and display info modal
-let doInsertTitleLimitMark = function () {
-    console.debug('ep_title_limit.doInsertTitleLimitMark', arguments, this);
+let doInsertTitleLimitMark = function (context) {
+    console.debug('ep_title_limit.doInsertTitleLimitMark', arguments, context);
 
     const maxLength = window.clientVars.ep_title_limit.maxLength;
-    const rep = this.rep;
-    const documentAttributeManager = this.documentAttributeManager;
+    const rep = context.rep;
+    const documentAttributeManager = context.documentAttributeManager;
     const line = rep.lines.atIndex(0);
     let text = line.text;
     text = text.replace(/(^\*)/, '');
@@ -127,37 +127,28 @@ exports.aceAttribsToClasses = (hook, context) => {
 exports.aceInitialized = (hook, context) => {
     console.debug('ep_title_limit', hook, arguments);
     console.debug('DO NOTHING');
-    //
+
     // const editorInfo = context.editorInfo;
     // editorInfo.ace_doInsertTitleLimitMark = _(doInsertTitleLimitMark).bind(context);
 };
 
 // Triggers before any changes are made, enables plugins to change outcome
 exports.aceKeyEvent = (hook, context) => {
-
-
     // Check for 'keydown' event only for mobiles to act the same way as desktop - https://github.com/citizenos/citizenos-fe/issues/535#issuecomment-805897450
-    // if (context.evt.type !== 'keydown') {
-    //     return false;
-    // }
-    //
-    // // Avoid race condition (callStack === null)
-    // setTimeout(function () {
-    //     context.editorInfo.ace_callWithAce(function (ace) {
-    //         const activeLine = ace.ace_caretLine();
-    //         if (activeLine === 0) {
-    //             ace.ace_doInsertTitleLimitMark();
-    //         }
-    //     }, 'insertTitleLimitMark', true);
-    // }, 0);
-    //
-    // // Take away EP-s special handling of BACKSPACE
-    // // FIXME: IF IT WORKS, MACs CMD-H (backspace) should also be handled
-    // if (context.evt.key === 'Backspace' || context.evt.keyCode === 8) { // DOES NOT WORK ON MOBILE, as the keyCode is always 229
-    //     return true;
-    // }
-    //
-    // // FIXME
+    if (context.evt.type !== 'keydown') {
+        return false;
+    }
+
+    // Avoid race condition (callStack === null)
+    setTimeout(function () {
+        context.editorInfo.ace_callWithAce(function (ace) {
+            const activeLine = ace.ace_caretLine();
+            if (activeLine === 0) {
+                doInsertTitleLimitMark(context);
+            }
+        }, 'insertTitleLimitMark', true);
+    }, 0);
+
     return false;
 };
 
