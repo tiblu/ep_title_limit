@@ -58,36 +58,35 @@ const _displayInfoModal = () => {
 // Wrap over limit text with marker and display info modal
 let doInsertTitleLimitMark = function () {
     console.debug('ep_title_limit.doInsertTitleLimitMark', arguments, this);
-    console.debug('ep_title_limit.doInsertTitleLimitMark', 'DOING NOTHING!');
 
-    // const maxLength = window.clientVars.ep_title_limit.maxLength;
-    // const rep = this.rep;
-    // const documentAttributeManager = this.documentAttributeManager;
-    // const line = rep.lines.atIndex(0);
-    // let text = line.text;
-    // text = text.replace(/(^\*)/, '');
-    //
-    // if (text === previousTitleText) {
-    //     // NOTE! If the text has not changes, there is nothing to update in the UI!
-    //     return;
-    // }
-    //
-    // if (text.trim().length <= maxLength) {
-    //     previousTitleText = text;
-    //     // if (_checkLineForAttr(rep, 0, 'ep_title_limit_ttl')) {
-    //     //     console.debug('ep_title_limit.setAttributesOnRange', 'UNSET');
-    //     //     documentAttributeManager.setAttributesOnRange([0, 0], [0, line.text.length], [['ep_title_limit_ttl', false]]);
-    //     // }
-    //     _hideInfoModal();
-    // } else {
-    //     console.debug('ep_title_limit.setAttributesOnRange', 'SET');
-    //     // documentAttributeManager.setAttributesOnRange(
-    //     //     [0, maxLength + 1],
-    //     //     [0, line.text.length], [['ep_title_limit_ttl', 'ep_title_limit_ttl']]
-    //     // );
-    //     previousTitleText = text;
-    //     _displayInfoModal();
-    // }
+    const maxLength = window.clientVars.ep_title_limit.maxLength;
+    const rep = this.rep;
+    const documentAttributeManager = this.documentAttributeManager;
+    const line = rep.lines.atIndex(0);
+    let text = line.text;
+    text = text.replace(/(^\*)/, '');
+
+    if (text === previousTitleText) {
+        // NOTE! If the text has not changes, there is nothing to update in the UI!
+        return;
+    }
+
+    if (text.trim().length <= maxLength) {
+        previousTitleText = text;
+        if (_checkLineForAttr(rep, 0, 'ep_title_limit_ttl')) {
+            console.debug('ep_title_limit.setAttributesOnRange', 'UNSET');
+            documentAttributeManager.setAttributesOnRange([0, 0], [0, line.text.length], [['ep_title_limit_ttl', false]]);
+        }
+        _hideInfoModal();
+    } else {
+        console.debug('ep_title_limit.setAttributesOnRange', 'SET');
+        documentAttributeManager.setAttributesOnRange(
+            [0, maxLength + 1],
+            [0, line.text.length], [['ep_title_limit_ttl', 'ep_title_limit_ttl']]
+        );
+        previousTitleText = text;
+        _displayInfoModal();
+    }
 };
 
 /**
@@ -137,14 +136,20 @@ exports.aceKeyEvent = (hook, context) => {
     }
 
     // Avoid race condition (callStack === null)
-    // context.editorInfo.ace_callWithAce(function (ace) {
-    //     const activeLine = ace.ace_caretLine();
-    //     if (activeLine === 0) {
-    //         ace.ace_doInsertTitleLimitMark();
-    //     }
-    // }, 'insertTitleLimitMark', true);
-    //
-    console.debug('ep_title_limit', 'hook' + hook, 'DO NOTHING', arguments);
+    setTimeout(function () {
+        context.editorInfo.ace_callWithAce(function (ace) {
+            const activeLine = ace.ace_caretLine();
+            if (activeLine === 0) {
+                ace.ace_doInsertTitleLimitMark();
+            }
+        }, 'insertTitleLimitMark', true);
+    }, 0);
+
+    // Take away EP-s special handling of BACKSPACE
+    // FIXME: IF IT WORKS, MACs CMD-H (backspace) should also be handled
+    if (evt.key === 'Backspace' || evt.keyCode === 8) {
+        return true;
+    }
 
     return false;
 };
