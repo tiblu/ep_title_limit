@@ -147,11 +147,12 @@ exports.aceKeyEvent = (hook, context) => {
 
     // Take away EP-s special handling of BACKSPACE
     // FIXME: IF IT WORKS, MACs CMD-H (backspace) should also be handled
-    if (context.evt.key === 'Backspace' || context.evt.keyCode === 8) {
+    if (context.evt.key === 'Backspace' || context.evt.keyCode === 8) { // DOES NOT WORK ON MOBILE, as the keyCode is always 229
         return true;
     }
 
-    return false;
+    // FIXME
+    return true;
 };
 
 exports.aceEditorCSS = () => ['ep_title_limit/static/css/ep_title_limit.css'];
