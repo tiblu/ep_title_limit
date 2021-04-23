@@ -137,17 +137,7 @@ exports.aceKeyEvent = (hook, context) => {
         return false;
     }
 
-
-
-    // Avoid race condition (callStack === null)
-    // setTimeout(function () {
-    //     context.editorInfo.ace_callWithAce(function (ace) {
-    //         const activeLine = ace.ace_caretLine();
-    //         if (activeLine === 0) {
-    //             doInsertTitleLimitMark(context);
-    //         }
-    //     }, 'insertTitleLimitMark', true);
-    // }, 0);
+    doInsertTitleLimitMark(context);
 
     return false;
 };
