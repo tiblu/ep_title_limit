@@ -101,7 +101,12 @@ let doInsertTitleLimitMark = function (context) {
  */
 exports.aceAttribsToClasses = (hook, context) => {
     console.debug('ep_title_limit', hook, arguments);
-    console.debug('DO NOTHING');
+    if (context.key.indexOf('ep_title_limit_ttl:') !== -1) {
+        return ['ep_title_limit_ttl'];
+    }
+    if (context.key === 'ep_title_limit_ttl') {
+        return ['ep_title_limit_ttl'];
+    }
 };
 
 /**
