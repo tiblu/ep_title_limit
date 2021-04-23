@@ -137,7 +137,14 @@ exports.aceKeyEvent = (hook, context) => {
         return false;
     }
 
-    doInsertTitleLimitMark(context);
+
+
+    // Avoid race condition (callStack === null)
+    setTimeout(function () {
+        context.editorInfo.ace_callWithAce(function (ace) {
+            console.debug('ep_title_limit', hook, context, 'ace_callWithAce');
+        }, 'insertTitleLimitMark', true);
+    }, 0);
 
     return false;
 };
