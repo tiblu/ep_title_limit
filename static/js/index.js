@@ -101,13 +101,7 @@ let doInsertTitleLimitMark = function (context) {
  */
 exports.aceAttribsToClasses = (hook, context) => {
     console.debug('ep_title_limit', hook, arguments);
-
-    if (context.key.indexOf('ep_title_limit_ttl:') !== -1) {
-        return ['ep_title_limit_ttl'];
-    }
-    if (context.key === 'ep_title_limit_ttl') {
-        return ['ep_title_limit_ttl'];
-    }
+    console.debug('DO NOTHING');
 };
 
 /**
@@ -130,20 +124,25 @@ exports.aceInitialized = (hook, context) => {
 
 // Triggers before any changes are made, enables plugins to change outcome
 exports.aceKeyEvent = (hook, context) => {
+    console.debug('ep_title_limit', hook, arguments);
+    console.debug('DO NOTHING!');
+
     // Check for 'keydown' event only for mobiles to act the same way as desktop - https://github.com/citizenos/citizenos-fe/issues/535#issuecomment-805897450
     if (context.evt.type !== 'keydown') {
         return false;
     }
 
+
+
     // Avoid race condition (callStack === null)
-    setTimeout(function () {
-        context.editorInfo.ace_callWithAce(function (ace) {
-            const activeLine = ace.ace_caretLine();
-            if (activeLine === 0) {
-                doInsertTitleLimitMark(context);
-            }
-        }, 'insertTitleLimitMark', true);
-    }, 0);
+    // setTimeout(function () {
+    //     context.editorInfo.ace_callWithAce(function (ace) {
+    //         const activeLine = ace.ace_caretLine();
+    //         if (activeLine === 0) {
+    //             doInsertTitleLimitMark(context);
+    //         }
+    //     }, 'insertTitleLimitMark', true);
+    // }, 0);
 
     return false;
 };
